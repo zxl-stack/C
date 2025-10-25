@@ -1,0 +1,64 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <semaphore.h>
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <time.h>
+
+// 随机延迟函数
+void random_delay() {
+    srand(time(NULL) ^ getpid());
+    usleep(rand() % 1000000); // 随机休眠0-999999微秒(最多1秒)
+}
+
+int main() {
+    // 定义缓冲区大小和初始状态
+    const int BUFFER_SIZE = 5;
+    const int INITIAL_EMPTY = 5;
+
+    // 初始化信号量
+    sem_t *empty = sem_open("/empty_sem", O_CREAT, 0644, INITIAL_EMPTY);
+    sem_t *full = sem_open("/full_sem", O_CREAT, 0644, 0);
+    sem_t *mutex = sem_open("/mutex_sem", O_CREAT, 0644, 1);
+    int empty_count, full_count;
+
+    printf("生产者启动，缓冲区大小: %d\n", BUFFER_SIZE);
+
+    // 生产者循环
+    for (int i = 0; i < 15; i++) {
+        random_delay(); // 模拟生产时间
+
+        // 等待空缓冲区
+        sem_wait(empty);
+        // 进入临界区
+        sem_wait(mutex);
+
+        // 获取当前信号量值
+        sem_getvalue(empty, &empty_count);
+        sem_getvalue(full, &full_count);
+
+        // 生产产品
+        printf("生产者生产了一个产品 #%d | 空闲缓冲区: %d | 已占用: %d\n",
+               i+1, empty_count, full_count+1);
+        fflush(stdout);
+        // 离开临界区
+        sem_post(mutex);
+        // 增加满缓冲区计数
+        sem_post(full);
+    }
+
+    // 清理资源
+    sleep(2); // 等待所有操作完成
+    sem_close(empty);
+    sem_close(full);
+    sem_close(mutex);
+
+    // 仅在最后一个进程结束时才取消链接
+    if (getpid() % 3 == 0) {
+        sem_unlink("/empty_sem");
+        sem_unlink("/full_sem");
+        sem_unlink("/mutex_sem");
+        printf("生产者清理了信号量资源\n");
+    }
+

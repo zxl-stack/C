@@ -1,0 +1,8 @@
+﻿  1.cpp
+D:\C\test\test\1.cpp(48,26): warning C4474: scanf_s: 格式字符串中传递的参数太多
+      D:\C\test\test\1.cpp(48,26):
+      占位符和其参数预计 1 可变参数，但提供的却是 2 参数
+  
+D:\C\test\test\1.cpp(97,15): warning C4244: “return”: 从“WPARAM”转换到“int”，可能丢失数据
+D:\C\test\test\1.cpp(102,15): warning C4244: “参数”: 从“time_t”转换到“unsigned int”，可能丢失数据
+  test.vcxproj -> D:\C\test\x64\Debug\test.exe

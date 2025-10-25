@@ -1,0 +1,107 @@
+mysql> CREATE DATABASE test;
+mysql> USE test;
+mysql> CREATE TABLE region
+    -> (regionkey INT PRIMARY KEY,
+    ->  name CHAR(25),
+    ->  comment VARCHAR(150)
+    -> );
+Query OK, 0 rows affected (0.05 sec)
+
+mysql> CREATE TABLE nation
+    -> (nationkey INT PRIMARY KEY,
+    ->  name CHAR(25),
+    ->  regionkey INT,
+    ->  comment VARCHAR(150),
+    ->  FOREIGN KEY(regionkey) REFERENCES region(regionkey)
+    -> );
+Query OK, 0 rows affected (0.04 sec)
+
+mysql> CREATE TABLE supplier
+    -> (suppkey INT PRIMARY KEY,
+    ->  name CHAR(100),
+    ->  address VARCHAR(100),
+    ->  nationkey INT,
+    ->  phone CHAR(30),
+    ->  acctbal DECIMAL(12,2),
+    ->  comment VARCHAR(100),
+    ->  FOREIGN KEY(nationkey) REFERENCES nation(nationkey)
+    -> );
+Query OK, 0 rows affected (0.04 sec)
+
+mysql> CREATE TABLE part
+    -> (partkey INT PRIMARY KEY,
+    ->  name VARCHAR(100),
+    ->  mfgr CHAR(50),
+    ->  brand CHAR(50),
+    ->  ptype VARCHAR(25),
+    ->  size INT,
+    ->  container CHAR(10),
+    ->  retailprice DECIMAL(8,2),
+    ->  comment VARCHAR(20)
+    -> );
+Query OK, 0 rows affected (0.03 sec)
+
+mysql> CREATE TABLE partsupp
+    -> (partkey INT,
+    ->  suppkey INT,
+    ->  availqty INT,
+    ->  supplycost DECIMAL(10,2),
+    ->  comment VARCHAR(200),
+    ->  PRIMARY KEY(partkey,suppkey),
+    ->  FOREIGN KEY(partkey) REFERENCES part(partkey),
+    ->  FOREIGN KEY(suppkey) REFERENCES supplier(suppkey)
+    -> );
+Query OK, 0 rows affected (0.04 sec)
+
+mysql> CREATE TABLE customer
+    -> (custkey INT PRIMARY KEY,
+    ->  name VARCHAR(25),
+    ->  address VARCHAR(40),
+    ->  nationkey INT,
+    ->  phone CHAR(30),
+    ->  acctbal DECIMAL(12,2),
+    ->  mktsegment CHAR(10),
+    ->  comment VARCHAR(100),
+    ->  FOREIGN KEY(nationkey) REFERENCES nation(nationkey)
+    -> );
+Query OK, 0 rows affected (0.05 sec)
+
+mysql> CREATE TABLE orders
+    -> (orderkey INT PRIMARY KEY,
+    ->  custkey INT,
+    ->  orderstatus CHAR(1),
+    ->  totalprice DECIMAL(10,2),
+    ->  orderdate DATE,
+    ->  orderpriority CHAR(15),
+    ->  clerk CHAR(16),
+    ->  shippriority CHAR(1),
+    ->  comment VARCHAR(60),
+    ->  FOREIGN KEY(custkey) REFERENCES customer(custkey)
+    -> );
+Query OK, 0 rows affected (0.04 sec)
+
+mysql> CREATE TABLE lineitem
+    ->  (orderkey INT,
+    ->   partkey INT,
+    ->   suppkey INT,
+    ->   linenumber INT,
+    ->   quantity INT,
+    ->   extendedprice DECIMAL(8,2),
+    ->   discount DECIMAL(3,2),
+    ->   tax DECIMAL(3,2),
+    ->   returnflag CHAR(1),
+    ->   linestatus CHAR(1),
+    ->   shipdate DATE,
+    ->   commitdate DATE,
+    ->   receiptdate DATE,
+    ->   shipinstruct CHAR(25),
+    ->   shipmode CHAR(10),
+    ->   comment VARCHAR(40),
+    ->   PRIMARY KEY(orderkey,linenumber),
+    ->   FOREIGN KEY(orderkey) REFERENCES orders(orderkey),
+    ->   FOREIGN KEY(partkey,suppkey) REFERENCES partsupp(partkey,suppkey)
+    -> );
+Query OK, 0 rows affected (0.05 sec)
+    CREATE INDEX Dindex ON orders(orderdate DESC);
+
+#实验二
